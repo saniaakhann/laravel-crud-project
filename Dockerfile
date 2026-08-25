@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libsqlite3-dev \
+    libonig-dev \
     && docker-php-ext-install \
     pdo_sqlite \
     mbstring \
@@ -31,7 +32,7 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 # Configure Apache to serve Laravel's public directory
-RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/html/public#' \
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' \
     /etc/apache2/sites-available/000-default.conf
 
 # Allow Laravel .htaccess overrides
@@ -39,9 +40,9 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
     /etc/apache2/apache2.conf
 
 # Configure Apache to listen on Render's port
-RUN sed -i 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf
+RUN sed -i 's|Listen 80|Listen 10000|' /etc/apache2/ports.conf
 
-RUN sed -i 's/:80>/:10000>/' \
+RUN sed -i 's|:80>|:10000>|' \
     /etc/apache2/sites-available/000-default.conf
 
 # Expose Render port
